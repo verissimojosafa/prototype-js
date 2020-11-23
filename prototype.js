@@ -1,45 +1,37 @@
-const fetch = require ('node-fetch')
+const fetch = require('node-fetch')
 
 const address = {
     _cep: "",
 
-    cep: {
-        get: function() {
-            const cep = this._cep.slice(0, 3) + '.' + this._cep.slice(3, 6) + '-' + this._cep.slice(6, 8);
-            return cep;
-        },
-        set: async function(value) {
-            const mask = /[0-9]/g
-            this._cep = value.match(mask).slice(0, 8).join('');
-        },
-        enumerable: true,
-        configurable: false
+    get cep() {
+        const cep = this._cep.slice(0, 3) + '.' + this._cep.slice(3, 6) + '-' + this._cep.slice(6, 8);
+        return cep;
     },
 
-    getAddressData: {
-        value: async function() {
-            let cep = this.cep.replace('.', '');
-            cep = cep.replace('-', '');
+    set cep(value) {
+        const mask = /[0-9]/g
+        this._cep = value.match(mask).slice(0, 8).join('');
+    },
 
-            const cepJson = await fetch(`https://viacep.com.br/ws/${cep}/json/`)
-                .then(response => response.json())
-                .then(json => json);
+    getAddressData: async function() {
+        let cep = this.cep.replace('.', '');
+        cep = cep.replace('-', '');
 
-            return Object.defineProperties({}, {
-                logradouro: { value: cepJson.logradouro, writable: false, enumerable: true, configurable: false},
-                bairro: { value: cepJson.bairro, writable: false, enumerable: true, configurable: false},
-                localidade: { value: cepJson.localidade, writable: false, enumerable: true, configurable: false},
-                uf: { value: cepJson.uf, writable: false, enumerable: true, configurable: false},
-                toString: {
-                    value: function() {
-                        return `${this.logradouro},${this.bairro},${this.localidade},${this.uf},`
-                    }
+        const cepJson = await fetch(`https://viacep.com.br/ws/${cep}/json/`)
+            .then(response => response.json())
+            .then(json => json);
+
+        return Object.defineProperties({}, {
+            logradouro: { value: cepJson.logradouro, writable: false, enumerable: true, configurable: false},
+            bairro: { value: cepJson.bairro, writable: false, enumerable: true, configurable: false},
+            localidade: { value: cepJson.localidade, writable: false, enumerable: true, configurable: false},
+            uf: { value: cepJson.uf, writable: false, enumerable: true, configurable: false},
+            toString: {
+                value: function() {
+                    return `${this.logradouro},${this.bairro},${this.localidade},${this.uf},`
                 }
-            })
-        },
-        writable: false,
-        enumerable: false,
-        configurable: false,
+            }
+        })
     },
 }
 
@@ -55,7 +47,6 @@ Object.defineProperties(person, {
         set: function name(value) {
             this._name = value.toLowerCase();
         },
-        writable: false,
         enumerable: true,
         configurable: false,
     },
@@ -67,7 +58,6 @@ Object.defineProperties(person, {
         set: function email(value) {
             this._email = value.replace(/\W/g, '').toLowerCase();
         },
-        writable: false,
         enumerable: true,
         configurable: false,
     },
@@ -83,13 +73,26 @@ Object.defineProperties(person, {
 })
 
 const user = Object.create(person);
+Object.defineProperties(user, {
+    username: { value: "", writable: true, enumerable: true, configurable: true},
+    group: { value: "", writable: true, enumerable: true, configurable: true},
+    showData: {
+        value: function() {
+            this.getAddressData().then(address => {
+                console.log(`Name: ${this.name}`);
+                console.log(`Email: ${this.email}`);
+                console.log(`Username: ${this.username}`);
+                console.log(address.toString());
+            })
+        },
+        writable: false,
+        enumerable: false,
+        configurable: false,
+    }
+})
 
-person.name = "josafa";
-person.email = "josafaverissimo98@gmail.com"
-console.log(person.toString())
-
-address.cep = "5dsad7sad0sa7sa5dsa4dssadasasaddssadsaad4dsda0";
-const addressData = address.getAddressData()
-    .then(address => {
-        console.log(address.toString())
-    })
+user.name = "Josafá Veríssimo";
+user.email = "josafaverissimo98@gmail.com";
+user.username = "srkiris";
+user.cep = "5das7dad0as7dasas5daadasdadass4sasdsdaaddaa4dasdadsad0";
+user.showData();
