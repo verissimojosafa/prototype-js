@@ -1,31 +1,7 @@
 const fetch = require ('node-fetch')
 
-const person = {
-    _name: "",
-    _email: "",
-
-    get name() {
-        return this._name;
-    },
-    set name(value) {
-        this._name = value.toLowerCase();
-    },
-
-    get email() {
-        return this._email;
-    },
-    set email(value) {
-        this._email = value.replace(/\W/g, '').toLowerCase();
-    },
-
-    toString() {
-        return `name: ${this.name},\nemail: ${this.email},`;
-    }
-}
-
-const address = Object.create(person)
-Object.defineProperties(address, {
-    _cep: { value: "", writable: true, enumerable: false, configurable: true },
+const address = {
+    _cep: "",
 
     cep: {
         get: function() {
@@ -65,7 +41,48 @@ Object.defineProperties(address, {
         enumerable: false,
         configurable: false,
     },
+}
+
+const person = Object.create(address);
+Object.defineProperties(person, {
+    _name: { value: "", writable: true, enumerable: false, configurable: true},
+    _email: { value: "", writable: true, enumerable: false, configurable: true},
+
+    name: {
+        get: function name() {
+            return this._name;
+        },
+        set: function name(value) {
+            this._name = value.toLowerCase();
+        },
+        writable: false,
+        enumerable: true,
+        configurable: false,
+    },
+
+    email: {
+        get: function email() {
+            return this._email;
+        },
+        set: function email(value) {
+            this._email = value.replace(/\W/g, '').toLowerCase();
+        },
+        writable: false,
+        enumerable: true,
+        configurable: false,
+    },
+
+    toString: {
+        value: function() {
+            return `name: ${this.name},\nemail: ${this.email},`;
+        },
+        writable: true,
+        enumerable: false,
+        configurable: true,
+    }
 })
+
+const user = Object.create(person);
 
 person.name = "josafa";
 person.email = "josafaverissimo98@gmail.com"
