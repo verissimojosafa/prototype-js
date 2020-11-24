@@ -7,12 +7,10 @@ module.exports = {
     },
 
     async create(request, response) {
-        const { name, priority } = request.query;
-
-        console.log(name, priority)
+        const { name, priority } = request.body;
 
         const lastId = await Todolist.insertData(name, priority)
 
-        response.json(lastId);
+        response.json({lastId});
     }
 }
